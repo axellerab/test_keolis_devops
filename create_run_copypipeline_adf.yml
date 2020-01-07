@@ -1,0 +1,31 @@
+variables:
+  SUBSCRIPTION_ID: $[coalesce(variables['SUBSCRIPTION_ID_OVERRIDE'], '')]
+  BASE_NAME: $[coalesce(variables['BASE_NAME_OVERRIDE'], 'testaskia')]
+  S3_KEY_ID: $[coalesce(variables['S3_KEY_ID_OVERRIDE'], '')]
+  S3_SECRET_KEY: $[coalesce(variables['S3_SECRET_KEY_OVERRIDE'], '')]
+  BLOB_CONNECT_STR: $[coalesce(variables['BLOB_CONNECT_STR_OVERRIDE'], '')]
+  AZ_CLIENTID: $[coalesce(variables['AZ_CLIENTID_OVERRIDE'], '')]
+  AZ_SECRET: $[coalesce(variables['AZ_SECRET_OVERRIDE'], '')]
+  AZ_TENANTID: $[coalesce(variables['AZ_TENANTID_OVERRIDE'], '')]
+  ADF_LINKSERVICE_S3_NAME: $[coalesce(variables['ADF_LINKSERVICE_S3_NAME_OVERRIDE'], 'mylss3name')]
+  ADF_LINKSERVICE_BLOB_NAME: $[coalesce(variables['ADF_LINKSERVICE_BLOB_NAME_OVERRIDE'], 'mylsblobname')]
+  ADF_DSIN_NAME: $[coalesce(variables['ADF_DSIN_NAME_OVERRIDE'], 'mydsinname')]
+  S3_BUCKET: $[coalesce(variables['S3_BUCKET_OVERRIDE'], '')]
+  S3_PATH: $[coalesce(variables['S3_PATH_OVERRIDE'], '')]
+  ADF_DSOUT_NAME: $[coalesce(variables['ADF_DSOUT_NAME_OVERRIDE'], 'mydsoutname')]
+  BLOB_CTNR_NAME: $[coalesce(variables['BLOB_CTNR_NAME_OVERRIDE'], 'mycontainernameaskiatest')]
+  ADF_ACTIVITY_NAME: $[coalesce(variables['ADF_ACTIVITY_NAME_OVERRIDE'], 'mycopyactivityname')]
+  ADF_PIPE_NAME: $[coalesce(variables['ADF_PIPE_NAME_OVERRIDE'], 'mypipelinename')]
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6'
+
+- bash: |
+   python -m pip install --upgrade pip
+   python -m pip install -r requirements.txt
+  displayName: 'Install Packages'
+
+- script: python $(Build.SourcesDirectory)/datafactory_tests.py --subscription_id "$(SUBSCRIPTION_ID)" --rg_name "$(BASE_NAME)-RG" --df_name "$(BASE_NAME)-DF" --s3_key_id "$(S3_KEY_ID)" --s3_scrt_key "$(S3_SECRET_KEY)" --blb_connect_str "$(BLOB_CONNECT_STR)" --az_cliid "$(AZ_CLIENTID)" --az_scrt "$(AZ_SECRET)" --az_tntid "$(AZ_TENANTID)" --ls_s3_name "$(ADF_LINKSERVICE_S3_NAME)" --ls_blob_name "$(ADF_LINKSERVICE_BLOB_NAME)" --dsin_name "$(ADF_DSIN_NAME)" --s3_bucket "$(S3_BUCKET)" --s3_path "$(S3_PATH)" --dsout_name "$(ADF_DSOUT_NAME)" --blob_container_name "$(BLOB_CTNR_NAME)" --act_name "$(ADF_ACTIVITY_NAME)" --pipe_name "$(ADF_PIPE_NAME)"
+  displayName: 'Datafactory Pipeline creation copy S3 to Blob'

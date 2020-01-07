@@ -1,0 +1,23 @@
+variables:
+  SERVICE_CONNECTION: $[coalesce(variables['SERVICE_CONNECTION_OVERRIDE'], 'RMco')]
+  SUBSCRIPTION_ID: $[coalesce(variables['SUBSCRIPTION_ID_OVERRIDE'], '')]
+  CLIENT_ID: $[coalesce(variables['CLIENT_ID_OVERRIDE'], '')]
+  SECRET: $[coalesce(variables['SECRET_OVERRIDE'], '')]
+  TENANT_ID: $[coalesce(variables['TENANT_ID_OVERRIDE'], '')]
+  BASE_NAME: $[coalesce(variables['BASE_NAME_OVERRIDE'], 'testaskia')]
+  LOCATION: $[coalesce(variables['LOCATION_OVERRIDE'], 'westeurope')]
+  DATAFILEPATH: $[coalesce(variables['DATAFILEPATH_OVERRIDE'], 'meteodata.csv')]
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6'
+
+- bash: |
+   python -m pip install --upgrade pip
+   python -m pip install -r requirements.txt
+  displayName: 'Install Packages'
+
+- script: python $(Build.SourcesDirectory)/aml_pipeline_test.py --sub "$(SUBSCRIPTION_ID)" --cliid "$(CLIENT_ID)" --pwd "$(SECRET)" --tntid "$(TENANT_ID)" --basename "$(BASE_NAME)" --loc "$(LOCATION)" --datafilepath "$(DATAFILEPATH)"
+  displayName: 'Test aml pipeline'
+

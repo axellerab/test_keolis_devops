@@ -1,0 +1,21 @@
+variables:
+  STORAGE_ACCOUNT: $[coalesce(variables['STORAGE_ACCOUNT_OVERRIDE'], '')]
+  STORAGE_KEY: $[coalesce(variables['STORAGE_KEY_OVERRIDE'], '')]
+  CONNECT_STR: $[coalesce(variables['CONNECT_STR_OVERRIDE'], '')]
+  URL: $[coalesce(variables['URL_OVERRIDE'], 'http://www.soda-pro.com/fr/web-services/meteo-data/gfs-forecasts')]
+  LATITUDE: $[coalesce(variables['LATITUDE_OVERRIDE'], '48.85')]
+  LONGITUDE: $[coalesce(variables['LONGITUDE_OVERRIDE'], '2.35')]
+  FORECAST_LENGTH: $[coalesce(variables['FORECAST_LENGTH_OVERRIDE'], '1')]
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6'
+
+- bash: |
+   python -m pip install --upgrade pip
+   python -m pip install -r requirements.txt
+  displayName: 'Install Packages'
+
+- script: python $(Build.SourcesDirectory)/recup_meteo.py --sa "$(STORAGE_ACCOUNT)" --sk "$(STORAGE_KEY)" --cs "$(CONNECT_STR)" --url "$(URL)" --lat "$(LATITUDE)" --lon "$(LONGITUDE)" --fl "$(FORECAST_LENGTH)"
+  displayName: 'test script meteo docker selenium'
